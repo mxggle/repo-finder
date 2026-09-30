@@ -1,0 +1,24 @@
+const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
+const full = new Intl.NumberFormat('en')
+const relative = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+const absolute = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
+
+export const formatCompact = (value: number) => compact.format(value)
+export const formatNumber = (value: number) => full.format(value)
+export const formatDate = (date: Date) => absolute.format(date)
+
+const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ['year', 365 * 24 * 60 * 60],
+  ['month', 30 * 24 * 60 * 60],
+  ['day', 24 * 60 * 60],
+  ['hour', 60 * 60],
+  ['minute', 60],
+]
+
+export function formatRelative(date: Date, now = Date.now()): string {
+  const seconds = (date.getTime() - now) / 1000
+  for (const [unit, size] of UNITS) {
+    if (Math.abs(seconds) >= size) return relative.format(Math.round(seconds / size), unit)
+  }
+  return 'just now'
+}
