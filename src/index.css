@@ -376,6 +376,8 @@ code {
 
 .search-form {
   position: relative;
+  /* Lifts the suggestions above later sections, which the landing animation layers separately. */
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -420,6 +422,11 @@ code {
     box-shadow var(--duration);
 }
 
+/* Keep typed text from running into the native clear button. */
+.search-form__input::-webkit-search-cancel-button {
+  margin-left: 10px;
+}
+
 .search-form__input::placeholder {
   color: var(--color-text-subtle);
 }
@@ -458,10 +465,105 @@ code {
   animation: rise var(--duration) var(--ease-out);
 }
 
+/* Suggestions float over the page so they never push the results around. */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 5;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  animation: fade var(--duration-fast) var(--ease-out);
+}
+
+.suggestions__list {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: var(--color-surface-muted);
+}
+
+.suggestion[aria-selected='true'] {
+  background: var(--color-accent-soft);
+}
+
+.suggestion[aria-selected='true'] .suggestion__label {
+  color: var(--color-accent);
+}
+
+.suggestion__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+.suggestion__label {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.suggestion__description {
+  margin-left: auto;
+  padding-left: 12px;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  color: var(--color-text-subtle);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestions__keys {
+  padding: 8px 16px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  font-size: 0.75rem;
+  color: var(--color-text-subtle);
+}
+
+.suggestions__keys kbd {
+  margin-right: 2px;
+  padding: 0 4px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+/* Touch keyboards have no arrow keys. */
+@media (pointer: coarse) {
+  .suggestions__keys {
+    display: none;
+  }
+
+  .suggestion {
+    min-height: 44px;
+  }
+}
+
 /* ---------- Examples ---------- */
 
 .examples {
-  margin-top: 28px;
+  margin-top: 36px;
 }
 
 .examples__title {

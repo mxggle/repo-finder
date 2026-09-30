@@ -56,8 +56,8 @@ export default function App() {
           <div className="intro">
             <h1 className="intro__title">Find GitHub repositories</h1>
             <p className="intro__lead">
-              Search public repositories by keyword, or use GitHub qualifiers like <code>language:</code>,{' '}
-              <code>stars:</code> and <code>topic:</code>.
+              Search public repositories by keyword, and narrow them down with GitHub’s qualifiers. The search box
+              suggests them as you type.
             </p>
           </div>
         )}

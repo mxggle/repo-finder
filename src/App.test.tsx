@@ -42,7 +42,7 @@ describe('App', () => {
     const requests = recordRequests()
     const { user } = renderApp()
 
-    await user.type(screen.getByRole('searchbox', { name: 'Search repositories' }), '  react  {Enter}')
+    await user.type(screen.getByRole('combobox', { name: 'Search repositories' }), '  react  {Enter}')
 
     expect(await screen.findByRole('heading', { name: /45 repositories for “react”/ })).toBeInTheDocument()
     expect(window.location.search).toBe('?q=react')
@@ -54,17 +54,93 @@ describe('App', () => {
     const requests = recordRequests()
     const { user } = renderApp()
 
-    await user.type(screen.getByRole('searchbox'), '   {Enter}')
+    await user.type(screen.getByRole('combobox', { name: 'Search repositories' }), '   {Enter}')
 
     expect(screen.getByRole('alert')).toHaveTextContent('Enter a keyword')
     expect(requests).toHaveLength(0)
     expect(window.location.search).toBe('')
   })
 
+  it('completes qualifiers and their values from the suggestions', async () => {
+    const requests = recordRequests()
+    const { user } = renderApp()
+    const input = screen.getByRole<HTMLInputElement>('combobox', { name: 'Search repositories' })
+
+    // An empty box lists every qualifier.
+    await user.click(input)
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'language:Written in a language',
+      'stars:Number of stars',
+      'topic:Tagged with a topic',
+    ])
+
+    await user.click(screen.getByRole('option', { name: /^language:/ }))
+    expect(input).toHaveValue('language:')
+
+    await user.keyboard('ru{ArrowDown}')
+    expect(input).toHaveAttribute('aria-activedescendant', screen.getByRole('option', { name: 'Rust' }).id)
+    await user.keyboard('{Enter}')
+    expect(input).toHaveValue('language:rust ')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(requests).toHaveLength(0)
+
+    await user.keyboard('cli{Enter}')
+    await waitFor(() => expect(requests).toHaveLength(1))
+    expect(requests[0].get('q')).toBe('language:rust cli')
+  })
+
+  it('keeps Enter for searching until a suggestion is picked with the arrow keys', async () => {
+    const requests = recordRequests()
+    const { user } = renderApp()
+
+    await user.type(screen.getByRole('combobox', { name: 'Search repositories' }), 'react s')
+    expect(screen.getByRole('option', { name: /^stars:/ })).toBeInTheDocument()
+    await user.keyboard('{Enter}')
+
+    await waitFor(() => expect(requests).toHaveLength(1))
+    expect(requests[0].get('q')).toBe('react s')
+  })
+
+  it('lets the user type anything, including repeated qualifiers', async () => {
+    const requests = recordRequests()
+    const { user } = renderApp()
+
+    await user.type(screen.getByRole('combobox', { name: 'Search repositories' }), 'topic:cli topic:api{Enter}')
+
+    await waitFor(() => expect(requests).toHaveLength(1))
+    expect(requests[0].get('q')).toBe('topic:cli topic:api')
+  })
+
+  it('closes the suggestions on Escape without clearing the query', async () => {
+    recordRequests()
+    const { user } = renderApp()
+    const input = screen.getByRole('combobox', { name: 'Search repositories' })
+
+    await user.type(input, 'stars:')
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(input).toHaveValue('stars:')
+    // Typing on brings them back.
+    await user.keyboard('>')
+    expect(screen.getByRole('option', { name: '>1000More than 1,000' })).toBeInTheDocument()
+  })
+
+  it('suggests on the results page too', async () => {
+    recordRequests()
+    const { user } = renderApp('/?q=react')
+    await screen.findByRole('heading', { name: /45 repositories/ })
+
+    await user.type(screen.getByRole('combobox', { name: 'Search repositories' }), ' lang')
+
+    expect(screen.getByRole('option', { name: /^language:/ })).toBeInTheDocument()
+  })
+
   it('ignores the Enter key that confirms an IME conversion', async () => {
     recordRequests()
     renderApp()
-    const input = screen.getByRole('searchbox')
+    const input = screen.getByRole('combobox', { name: 'Search repositories' })
     fireEvent.change(input, { target: { value: '日本語' } })
 
     // Safari reports the confirming Enter with keyCode 229 after compositionend.
@@ -118,7 +194,7 @@ describe('App', () => {
     const { user } = renderApp('/?q=react&sort=forks&page=3')
     await screen.findByRole('heading', { name: /showing 41–45/ })
 
-    const input = screen.getByRole('searchbox')
+    const input = screen.getByRole('combobox', { name: 'Search repositories' })
     await user.clear(input)
     await user.type(input, 'vue{Enter}')
 
@@ -139,7 +215,7 @@ describe('App', () => {
     })
 
     expect(await screen.findByRole('heading', { name: /showing 1–20/ })).toBeInTheDocument()
-    expect(screen.getByRole('searchbox')).toHaveValue('react')
+    expect(screen.getByRole('combobox', { name: 'Search repositories' })).toHaveValue('react')
   })
 
   it('normalises an invalid page in the URL', async () => {
@@ -202,7 +278,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: /Try again in \d+s/ })).toBeDisabled()
 
     // Searching again while blocked is answered locally.
-    const input = screen.getByRole('searchbox')
+    const input = screen.getByRole('combobox', { name: 'Search repositories' })
     await user.clear(input)
     await user.type(input, 'vue{Enter}')
     expect(await screen.findByRole('heading', { name: 'Search limit reached' })).toBeInTheDocument()
@@ -264,7 +340,7 @@ describe('App', () => {
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('showing 1–20')
 
     // Different query: the old results must disappear immediately.
-    const input = screen.getByRole('searchbox')
+    const input = screen.getByRole('combobox', { name: 'Search repositories' })
     await user.clear(input)
     await user.type(input, 'vue{Enter}')
     expect(screen.queryAllByRole('link', { name: /octo-org\// })).toHaveLength(0)
@@ -288,7 +364,7 @@ describe('App', () => {
       }),
     )
     const { user } = renderApp()
-    const input = screen.getByRole('searchbox')
+    const input = screen.getByRole('combobox', { name: 'Search repositories' })
 
     await user.type(input, 'slow{Enter}')
     await user.clear(input)

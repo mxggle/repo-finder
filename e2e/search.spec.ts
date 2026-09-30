@@ -9,7 +9,7 @@ test('keyboard-only search, pagination and browser history', async ({ page, isMo
 
   await page.keyboard.press('Tab') // brand link
   await page.keyboard.press('Tab')
-  await expect(page.getByRole('searchbox', { name: 'Search repositories' })).toBeFocused()
+  await expect(page.getByRole('combobox', { name: 'Search repositories' })).toBeFocused()
   await page.keyboard.type('react')
   await page.keyboard.press('Enter')
 
@@ -42,7 +42,7 @@ test('a shared URL restores query, sort and page', async ({ page, isMobile }) =>
   await page.goto('/?q=react&sort=stars&page=3')
 
   await expect(page.getByRole('heading', { name: /showing 41–60/ })).toBeVisible()
-  await expect(page.getByRole('searchbox')).toHaveValue('react')
+  await expect(page.getByRole('combobox', { name: 'Search repositories' })).toHaveValue('react')
   await expect(page.getByRole('combobox', { name: 'Sort' })).toHaveValue('stars')
 
   if (!isMobile) {
@@ -76,7 +76,7 @@ test('a slow earlier search never replaces a newer one', async ({ page }) => {
     }
   })
   await page.goto('/')
-  const input = page.getByRole('searchbox')
+  const input = page.getByRole('combobox', { name: 'Search repositories' })
 
   await input.fill('slow')
   await input.press('Enter')
@@ -108,7 +108,7 @@ test('rate limiting shows a countdown and stops further requests', async ({ page
   await expect(page.getByRole('heading', { name: 'Search limit reached' })).toBeVisible()
   await expect(page.getByRole('button', { name: /Try again in \d+s/ })).toBeDisabled()
 
-  const input = page.getByRole('searchbox')
+  const input = page.getByRole('combobox', { name: 'Search repositories' })
   await input.fill('vue')
   await input.press('Enter')
   await expect(page.getByRole('heading', { name: 'Search limit reached' })).toBeVisible()
