@@ -29,3 +29,7 @@ playwright-report
 
 # Local tooling
 .claude
+
+# Local environment files may hold secrets
+.env
+.env.*

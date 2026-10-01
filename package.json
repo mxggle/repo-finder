@@ -13,7 +13,9 @@
     "test:watch": "vitest",
     "e2e": "playwright test --project=desktop-chromium --project=mobile-webkit",
     "e2e:live": "playwright test --project=live",
-    "check": "pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm check:boundaries && pnpm lint && pnpm test:tooling && pnpm test && pnpm build",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "test:tooling": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.0",
