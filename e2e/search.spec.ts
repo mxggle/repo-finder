@@ -8,6 +8,7 @@ test('keyboard-only search, pagination and browser history', async ({ page, isMo
   await page.goto('/')
 
   await page.keyboard.press('Tab') // brand link
+  await page.keyboard.press('Tab') // theme switcher (one stop for the radio group)
   await page.keyboard.press('Tab')
   await expect(page.getByRole('combobox', { name: 'Search repositories' })).toBeFocused()
   await page.keyboard.type('react')

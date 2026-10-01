@@ -1,0 +1,10 @@
+/* Preserve the cascade; each owner maintains its own stylesheet. */
+@import '../styles/tokens.css';
+@import '../styles/base.css';
+@import './app.css';
+@import '../shared/ui/controls.css';
+@import '../features/search/form/form.css';
+@import '../features/search/results/results.css';
+@import '../features/search/form/filters.css';
+@import '../features/search/history/history.css';
+@import '../features/compare/compare.css';

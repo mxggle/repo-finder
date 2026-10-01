@@ -1,0 +1,234 @@
+/* ---------- Search filters ---------- */
+
+/* Sits below the search field inside the form's flex row. */
+.search-filters {
+  flex: 1 1 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 2px 0 0;
+  border: 0;
+}
+
+.search-filters__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 4px 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  transition:
+    border-color var(--duration-fast),
+    background-color var(--duration-fast);
+}
+
+.search-filter:has(.search-filter__select, .search-filter__number):not(:has(.search-filter__remove)) {
+  padding-right: 6px;
+}
+
+.search-filter--toggle {
+  padding-right: 10px;
+}
+
+.search-filter--active {
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  background: var(--color-accent-soft);
+}
+
+.search-filter__label {
+  flex: none;
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+
+.search-filter--active .search-filter__label {
+  color: var(--color-accent);
+}
+
+.search-filter--toggle .search-filter__label {
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.search-filter__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+.search-filter__select,
+.search-filter__number {
+  min-width: 0;
+  min-height: 26px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.search-filter__picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* A masked glyph follows the theme's text colour, unlike an SVG background with a fixed fill. */
+.search-filter__picker::after {
+  content: '';
+  position: absolute;
+  right: 5px;
+  width: 12px;
+  height: 12px;
+  background: var(--color-text-muted);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m3 4.5 3 3 3-3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  pointer-events: none;
+}
+
+.search-filter__select {
+  appearance: none;
+  max-width: 100%;
+  padding: 0 22px 0 4px;
+  background: transparent;
+  /* WebKit otherwise lets a long option's text widen the page beyond the select's own box. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.search-filter__number {
+  width: 8ch;
+  padding: 0 6px;
+  border-color: var(--color-border);
+  background: var(--color-surface-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.search-filter__number::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.search-filter__number[aria-invalid='true'] {
+  border-color: var(--color-error-text);
+}
+
+.search-filter__select:hover,
+.search-filter__number:hover {
+  border-color: var(--color-border-strong);
+}
+
+.search-filter__checkbox {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-accent-fill);
+  cursor: pointer;
+}
+
+.search-filter__value {
+  min-width: 0;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.search-filter__note {
+  min-width: 0;
+  color: var(--color-text-subtle);
+  font-size: 0.75rem;
+}
+
+.search-filter--locked {
+  padding-right: 10px;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.search-filter--invalid {
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-bg);
+}
+
+.search-filter--invalid .search-filter__note {
+  color: var(--color-warning-text);
+}
+
+.search-filter__remove {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  transition:
+    color var(--duration-fast),
+    background-color var(--duration-fast);
+}
+
+.search-filter__remove:hover {
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text);
+}
+
+.search-filters__error {
+  margin-top: 6px;
+  padding-left: 4px;
+  color: var(--color-error-text);
+  font-size: 0.8125rem;
+}
+
+.search-filters__status {
+  padding-left: 4px;
+  color: var(--color-text-subtle);
+  font-size: 0.8125rem;
+}
+
+.search-filters__status:not(:empty) {
+  margin-top: 6px;
+  animation: fade var(--duration) ease-out;
+}
+
+@media (pointer: coarse) {
+  .search-filter {
+    min-height: 44px;
+  }
+
+  .search-filter__remove {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* 16px or more keeps iOS Safari from zooming in on focus. */
+  .search-filter__select,
+  .search-filter__number {
+    min-height: 34px;
+    font-size: 1rem;
+  }
+}

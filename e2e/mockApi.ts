@@ -10,7 +10,6 @@ type Responder = (request: SearchRequest, route: Route) => Promise<void> | void
  */
 export async function mockSearchApi(page: Page, respond?: Responder) {
   const requests: SearchRequest[] = []
-
   await page.route('https://avatars.githubusercontent.com/**', (route) => route.abort())
   await page.route('https://api.github.com/**', async (route) => {
     const url = new URL(route.request().url())

@@ -1,0 +1,514 @@
+/* ---------- Compare toggle (in each repository card) ---------- */
+
+.compare-toggle {
+  /* Positioned after the title link, so it sits above that link's stretched hit area. */
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    color var(--duration-fast),
+    background-color var(--duration-fast),
+    border-color var(--duration-fast);
+}
+
+.compare-toggle:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+/* The checkbox stays in the accessibility tree and tab order; the box draws it. */
+.compare-toggle__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.compare-toggle__box {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: transparent;
+  transition:
+    background-color var(--duration-fast),
+    border-color var(--duration-fast),
+    color var(--duration-fast);
+}
+
+.compare-toggle:has(:checked) {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.compare-toggle:has(:checked) .compare-toggle__box {
+  border-color: var(--color-accent-fill);
+  background: var(--color-accent-fill);
+  color: var(--color-accent-contrast);
+}
+
+.compare-toggle:has(:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.compare-toggle[data-blocked] {
+  border-style: dashed;
+  color: var(--color-text-subtle);
+  cursor: not-allowed;
+}
+
+.compare-toggle[data-blocked] .compare-toggle__box {
+  opacity: 0.55;
+}
+
+@media (pointer: coarse) {
+  .compare-toggle {
+    min-height: 44px;
+  }
+}
+
+/* ---------- Selection tray ---------- */
+
+.compare-tray {
+  position: sticky;
+  bottom: 12px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 20px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  /* Opaque: text contrast must not depend on the results scrolling underneath. */
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  animation: rise var(--duration) var(--ease-out) both;
+}
+
+.compare-tray__title {
+  font-size: 0.875rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.compare-tray__count {
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.compare-tray__list {
+  display: flex;
+  flex: 1 1 280px;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compare-tray__item {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  padding-left: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.compare-tray__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compare-tray__remove {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  transition: color var(--duration-fast);
+}
+
+.compare-tray__remove:hover {
+  color: var(--color-error-text);
+}
+
+.compare-tray__remove:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.compare-tray__hint {
+  flex-basis: 100%;
+  order: 1;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.compare-tray__actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.compare-tray__actions .button {
+  min-height: 36px;
+  padding-inline: 14px;
+  font-size: 0.875rem;
+}
+
+.compare-tray__open[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (pointer: coarse) {
+  /* Taller, not wider: phone chips need their width for the repository name. */
+  .compare-tray__remove {
+    height: 44px;
+  }
+
+  .compare-tray__actions .button {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 600px) {
+  .compare-tray {
+    bottom: 8px;
+  }
+
+  .compare-tray__list {
+    flex-basis: 100%;
+  }
+
+  .compare-tray__item {
+    flex: 1 1 0;
+  }
+
+  /* Three chips share a phone's width; the full name stays in the title and remove label. */
+  .compare-tray__owner {
+    display: none;
+  }
+
+  .compare-tray__item {
+    padding-left: 8px;
+  }
+
+  .compare-tray__actions {
+    flex: 1 1 100%;
+  }
+
+  .compare-tray__actions .button {
+    flex: 1;
+  }
+}
+
+/* ---------- Comparison dialog ---------- */
+
+.compare-dialog {
+  width: min(1040px, 100% - 32px);
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+}
+
+.compare-dialog[open] {
+  display: flex;
+  animation: pop var(--duration) var(--ease-out);
+}
+
+.compare-dialog::backdrop {
+  background: rgb(9 9 11 / 0.5);
+}
+
+.compare-dialog__panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.compare-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.compare-dialog__heading {
+  min-width: 0;
+}
+
+.compare-dialog__title {
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+  border-radius: var(--radius-sm);
+}
+
+.compare-dialog__title:focus {
+  outline: none;
+}
+
+.compare-dialog__title:focus-visible {
+  outline: 2px solid var(--color-focus);
+}
+
+.compare-dialog__note {
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  color: var(--color-text-subtle);
+  text-wrap: pretty;
+}
+
+.compare-dialog__close {
+  flex: none;
+  min-height: 36px;
+  padding-inline: 14px;
+  font-size: 0.875rem;
+}
+
+.compare-dialog__empty {
+  padding: 32px 20px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* The only scroll container: sideways on narrow screens, down for long descriptions. */
+.compare-dialog__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.compare-dialog__scroll:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.compare-table {
+  --compare-field-width: 128px;
+
+  width: 100%;
+  min-width: calc(var(--compare-field-width) + var(--compare-columns, 2) * 180px);
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 0.875rem;
+}
+
+.compare-table[data-columns='3'] {
+  --compare-columns: 3;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.compare-table thead th,
+.compare-table__corner {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface);
+}
+
+.compare-table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: var(--compare-field-width);
+  background: var(--color-surface-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.compare-table__corner {
+  left: 0;
+  z-index: 2;
+  width: var(--compare-field-width);
+}
+
+.compare-table__repo a {
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+
+.compare-table__repo a:hover {
+  color: var(--color-accent);
+}
+
+.compare-table__owner {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.compare-table__name {
+  font-weight: 650;
+}
+
+.compare-table [data-field='stars'] td,
+.compare-table [data-field='forks'] td {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.compare-table__highest {
+  margin-left: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.compare-table__unknown {
+  font-style: italic;
+  color: var(--color-text-subtle);
+}
+
+.compare-table__detail {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-subtle);
+}
+
+.compare-table__language {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compare-table__language-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-text-subtle);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+.compare-table [data-field='description'] td {
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.compare-table__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compare-table [data-field='remove'] th,
+.compare-table [data-field='remove'] td {
+  border-bottom: 0;
+}
+
+.compare-table__remove {
+  min-height: 36px;
+  padding-inline: 12px;
+  font-size: 0.8125rem;
+}
+
+@media (pointer: coarse) {
+  .compare-dialog__close,
+  .compare-table__remove {
+    min-height: 44px;
+  }
+}
+
+/* Phones: the dialog fills the screen, so the page itself never scrolls sideways. */
+@media (max-width: 600px) {
+  .compare-dialog {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .compare-dialog__header {
+    padding: 14px 16px 12px;
+  }
+
+  .compare-table {
+    --compare-field-width: 96px;
+
+    min-width: calc(var(--compare-field-width) + var(--compare-columns, 2) * 150px);
+  }
+
+  .compare-table th,
+  .compare-table td {
+    padding: 10px;
+  }
+
+  /* Uppercase tracking would split long field names inside the narrow pinned column. */
+  .compare-table tbody th {
+    overflow-wrap: normal;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}

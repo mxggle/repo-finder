@@ -1,0 +1,296 @@
+/* ---------- Layout ---------- */
+
+/*
+ * Keeps elements scrolled into view (keyboard focus, anchors, scrollIntoView) clear
+ * of the sticky header instead of behind it (WCAG 2.4.11), and leaves room for the
+ * focus outline at the bottom edge.
+ */
+html {
+  scroll-padding-top: calc(var(--header-height) + 20px);
+  scroll-padding-bottom: 16px;
+}
+
+.app {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: radial-gradient(900px 420px at 50% -160px, var(--color-glow), transparent 70%) no-repeat;
+}
+
+/*
+ * A faint dot grid below the header that fades out downwards. It starts under
+ * the header so the header's blur never smears it into a band.
+ */
+.app::before {
+  content: '';
+  position: absolute;
+  inset: var(--header-height) 0 auto;
+  z-index: -1;
+  height: 520px;
+  background: radial-gradient(var(--color-grid) 1px, transparent 1.5px) 0 0 / 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 100% at 50% 0, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 100% at 50% 0, #000 20%, transparent 75%);
+  pointer-events: none;
+}
+
+.site-header,
+.main,
+.site-footer {
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  max-width: none;
+  min-height: var(--header-height);
+  /* Full-width bar whose content lines up with the content column. */
+  padding-inline: max(16px, calc((100% - var(--content-width)) / 2 + 16px));
+  border-bottom: 1px solid transparent;
+  background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+  -webkit-backdrop-filter: saturate(1.6) blur(12px);
+  backdrop-filter: saturate(1.6) blur(12px);
+  view-transition-name: site-header;
+}
+
+/* Show the header's divider only once the page has scrolled. */
+@supports (animation-timeline: scroll()) {
+  .site-header {
+    animation: header-elevate linear both;
+    animation-timeline: scroll();
+    animation-range: 0 48px;
+  }
+
+  @keyframes header-elevate {
+    to {
+      border-bottom-color: var(--color-border);
+    }
+  }
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 650;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.site-header__brand svg {
+  color: var(--color-accent-fill);
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.site-header__brand:hover svg {
+  transform: translateY(-1px);
+}
+
+/* The prompt cursor in the logo blinks once on hover. */
+.site-header__brand:hover .site-header__cursor {
+  animation: blink 0.5s steps(1) 2;
+}
+
+.main {
+  flex: 1;
+  padding-block: 24px 64px;
+}
+
+.app--landing .main {
+  padding-top: clamp(32px, 11vh, 112px);
+}
+
+.site-footer {
+  padding-block: 20px 32px;
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-subtle);
+}
+
+.site-footer a {
+  color: var(--color-text-muted);
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition: color var(--duration-fast);
+}
+
+.site-footer a:hover {
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
+}
+
+/* ---------- Landing ---------- */
+
+.intro {
+  margin-bottom: 32px;
+}
+
+.intro__eyebrow {
+  margin-bottom: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-text-subtle);
+}
+
+.intro__eyebrow span {
+  margin-right: 0.6ch;
+  color: var(--color-accent);
+}
+
+.intro__title {
+  font-size: clamp(2.125rem, 6.4vw, 3.25rem);
+  font-weight: 720;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+/* A terminal-style block cursor after the headline. */
+.intro__cursor {
+  display: inline-block;
+  width: 0.38em;
+  height: 0.8em;
+  margin-left: 0.1em;
+  vertical-align: -0.03em;
+  border-radius: 2px;
+  background: var(--color-accent);
+  animation: blink 1.1s steps(1) infinite;
+}
+
+.intro__lead {
+  margin-top: 16px;
+  max-width: 56ch;
+  color: var(--color-text-muted);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+/* Landing sections settle in one after another each time they appear. */
+.intro,
+.examples {
+  animation: rise var(--duration-slow) var(--ease-out) both;
+}
+
+.examples {
+  animation-delay: 120ms;
+}
+
+/* ---------- Landing examples ---------- */
+
+.examples {
+  margin-top: 36px;
+}
+
+.examples__title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.examples__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Page transition ---------- */
+
+/*
+ * Moving between the landing page and results morphs the search field into
+ * place (see shared/lib/viewTransition.ts); everything else cross-fades.
+ */
+::view-transition-group(*) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-out);
+}
+
+::view-transition-old(root) {
+  animation: 140ms ease-out both view-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 260ms var(--ease-out) 80ms both view-fade-in;
+}
+
+@keyframes view-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes view-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---------- Theme switcher ---------- */
+
+.theme-switcher {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0 0 0 auto;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.theme-switcher__option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    color var(--duration-fast),
+    box-shadow var(--duration-fast);
+}
+
+/* The radio stays in the accessibility tree and keyboard order; the label draws it. */
+.theme-switcher__option input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.theme-switcher__option:hover {
+  color: var(--color-text);
+}
+
+.theme-switcher__option:has(:checked) {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+}
+
+.theme-switcher__option:has(:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}

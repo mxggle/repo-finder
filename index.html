@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Search public GitHub repositories." />
     <title>Repo Finder</title>
+    <script>
+      // Resolve the theme before first paint to avoid a flash; mirrors src/app/theme.ts.
+      ;(function () {
+        var dark = matchMedia('(prefers-color-scheme: dark)').matches
+        try {
+          var saved = localStorage.getItem('repo-finder:theme')
+          if (saved === 'light' || saved === 'dark') dark = saved === 'dark'
+        } catch (error) {}
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

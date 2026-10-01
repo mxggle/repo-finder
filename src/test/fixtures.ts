@@ -1,3 +1,5 @@
+import { parseSearchResponse, type Repository } from '../domain/repository'
+
 // Shapes mirror the GitHub Search API response (snake_case) so tests exercise
 // the same parsing path as production.
 
@@ -16,6 +18,7 @@ export function makeRepo(id: number, overrides: Record<string, unknown> = {}) {
     topics: ['search', 'react'],
     license: { spdx_id: 'MIT', name: 'MIT License' },
     updated_at: '2026-09-01T12:00:00Z',
+    pushed_at: '2026-09-15T08:30:00Z',
     archived: false,
     fork: false,
     ...overrides,
@@ -37,3 +40,11 @@ export function makeSearchBody({
     items: Array.from({ length: count }, (_, index) => makeRepo(prefix + start + index + 1)),
   }
 }
+
+/** A parsed repository, built through the real parser so it has the app's runtime shape. */
+export function makeRepository(id: number, overrides: Record<string, unknown> = {}): Repository {
+  const body = { total_count: 1, incomplete_results: false, items: [makeRepo(id, overrides)] }
+  return parseSearchResponse(body).items[0]
+}
+
+export const FETCHED_AT = '2026-09-20T10:00:00.000Z'

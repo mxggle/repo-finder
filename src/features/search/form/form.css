@@ -1,0 +1,237 @@
+/* ---------- Search form ---------- */
+
+.search-form {
+  --search-button-width: 88px;
+
+  position: relative;
+  /* Lifts the suggestions above later sections, which animate in their own layers. */
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  /* Lets the page transition morph the field between the landing and results layouts. */
+  view-transition-name: search-form;
+  animation: rise var(--duration-slow) var(--ease-out) 60ms both;
+}
+
+.search-form__field {
+  position: relative;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.search-form__icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  display: flex;
+  translate: 0 -50%;
+  color: var(--color-text-subtle);
+  pointer-events: none;
+  transition: color var(--duration);
+}
+
+.search-form__field:focus-within .search-form__icon {
+  color: var(--color-accent);
+}
+
+.search-form__input {
+  width: 100%;
+  min-height: 54px;
+  /* Room on the right for the Search button that sits inside the field. */
+  padding: 0 calc(var(--search-button-width) + 20px) 0 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  /* Qualifiers read best in mono; 16px or more prevents iOS Safari from zooming in. */
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  transition:
+    border-color var(--duration),
+    box-shadow var(--duration);
+}
+
+/* Keep typed text from running into the native clear button. */
+.search-form__input::-webkit-search-cancel-button {
+  margin-left: 10px;
+}
+
+.search-form__input::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.search-form__input:hover {
+  border-color: color-mix(in srgb, var(--color-border-strong) 60%, var(--color-text-subtle));
+}
+
+.search-form__input:focus-visible {
+  /* Invisible normally; forced-colors mode drops the ring but paints this outline. */
+  outline: 2px solid transparent;
+  border-color: var(--color-focus);
+  box-shadow: var(--shadow-sm), var(--ring);
+}
+
+.search-form__input[aria-invalid='true'] {
+  border-color: var(--color-error-text);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 3px color-mix(in srgb, var(--color-error-text) 18%, transparent);
+  animation: shake 320ms var(--ease-out);
+}
+
+/* The "/" hint shows only while the empty field is waiting for focus. */
+.search-form__shortcut {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--search-button-width) + 18px);
+  translate: 0 -50%;
+  pointer-events: none;
+  transition:
+    opacity var(--duration-fast),
+    scale var(--duration-fast) var(--ease-out);
+}
+
+.search-form__input:focus ~ .search-form__shortcut,
+.search-form__input:not(:placeholder-shown) ~ .search-form__shortcut {
+  opacity: 0;
+  scale: 0.9;
+}
+
+/* Touch keyboards have no "/" shortcut, and narrow fields need the space. */
+@media (pointer: coarse), (max-width: 540px) {
+  .search-form__shortcut {
+    display: none;
+  }
+}
+
+.search-form .button {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  min-width: var(--search-button-width);
+  min-height: 40px;
+  padding-inline: 16px;
+}
+
+.search-form__hint {
+  flex-basis: 100%;
+  padding-left: 4px;
+  font-size: 0.875rem;
+  color: var(--color-error-text);
+  animation: rise var(--duration) var(--ease-out);
+}
+
+/* Suggestions float over the page so they never push the results around. */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 5;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  transform-origin: top center;
+  animation: pop var(--duration) var(--ease-out);
+}
+
+.suggestions__list {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+
+.suggestion {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 80ms;
+}
+
+.suggestion:hover {
+  background: var(--color-surface-muted);
+}
+
+.suggestion[aria-selected='true'] {
+  background: var(--color-accent-soft);
+}
+
+/* A slim marker makes the keyboard selection easy to follow. */
+.suggestion[aria-selected='true']::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--color-accent);
+}
+
+.suggestion[aria-selected='true'] .suggestion__label {
+  color: var(--color-accent);
+}
+
+.suggestion__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+.suggestion__label {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.suggestion__description {
+  margin-left: auto;
+  padding-left: 12px;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  color: var(--color-text-subtle);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestions__keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  font-size: 0.75rem;
+  /* Subtle text falls below 4.5:1 on the muted surface in both themes. */
+  color: var(--color-text-muted);
+}
+
+.suggestions__keys kbd {
+  font-size: 0.6875rem;
+  background: var(--color-surface);
+}
+
+/* Touch keyboards have no arrow keys. */
+@media (pointer: coarse) {
+  .suggestions__keys {
+    display: none;
+  }
+
+  .suggestion {
+    min-height: 44px;
+  }
+}
